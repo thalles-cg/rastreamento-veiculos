@@ -39,7 +39,6 @@ public class App {
       System.out.println("2 - Consultar última localização");
       System.out.println("3 - Limpar histórico antigo");
       System.out.println("0 - Sair");
-      System.out.print("Escolha uma opção: ");
 
       opcao = lerOpcao(scanner);
 
