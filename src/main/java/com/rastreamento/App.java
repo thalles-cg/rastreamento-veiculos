@@ -1,6 +1,7 @@
 package com.rastreamento;
 
 import java.time.LocalDateTime;
+import java.util.Scanner;
 
 import com.rastreamento.config.MongoConnection;
 import com.rastreamento.dao.LocalizacaoCacheDAO;
@@ -11,6 +12,8 @@ import com.rastreamento.service.TelemetriaService;
 public class App {
 
     public static void main(String[] args) {
+
+        Scanner scanner = new Scanner(System.in);
 
         MongoConnection mongo = new MongoConnection();
 
@@ -26,11 +29,20 @@ public class App {
                         cacheDAO
                 );
 
+        System.out.print("Identificador do veículo: ");
+        String veiculoId = scanner.nextLine();
+
+        System.out.print("Latitude: ");
+        double latitude = scanner.nextDouble();
+
+        System.out.print("Longitude: ");
+        double longitude = scanner.nextDouble();
+
         Localizacao localizacao =
                 new Localizacao(
-                        "VEICULO-004",
-                        -32.040,
-                        -52.100,
+                        veiculoId,
+                        latitude,
+                        longitude,
                         LocalDateTime.now()
                 );
 
@@ -40,6 +52,7 @@ public class App {
                 "Telemetria registrada com sucesso."
         );
 
+        scanner.close();
         mongo.close();
     }
 }
