@@ -1,23 +1,45 @@
 package com.rastreamento;
 
 import java.time.LocalDateTime;
+
+import com.rastreamento.config.MongoConnection;
 import com.rastreamento.dao.LocalizacaoCacheDAO;
+import com.rastreamento.dao.LocalizacaoDAO;
 import com.rastreamento.model.Localizacao;
+import com.rastreamento.service.TelemetriaService;
 
 public class App {
+
     public static void main(String[] args) {
 
-        Localizacao localizacao = new Localizacao(
-                "VEICULO-003",
-                -32.035,
-                -52.098,
-                LocalDateTime.now()
+        MongoConnection mongo = new MongoConnection();
+
+        LocalizacaoDAO localizacaoDAO =
+                new LocalizacaoDAO(mongo);
+
+        LocalizacaoCacheDAO cacheDAO =
+                new LocalizacaoCacheDAO();
+
+        TelemetriaService telemetriaService =
+                new TelemetriaService(
+                        localizacaoDAO,
+                        cacheDAO
+                );
+
+        Localizacao localizacao =
+                new Localizacao(
+                        "VEICULO-004",
+                        -32.040,
+                        -52.100,
+                        LocalDateTime.now()
+                );
+
+        telemetriaService.registrar(localizacao);
+
+        System.out.println(
+                "Telemetria registrada com sucesso."
         );
 
-        LocalizacaoCacheDAO cacheDAO =new LocalizacaoCacheDAO();
-
-        cacheDAO.salvar(localizacao);
-
-        System.out.println("Localização salva no cache com sucesso.");
+        mongo.close();
     }
 }
