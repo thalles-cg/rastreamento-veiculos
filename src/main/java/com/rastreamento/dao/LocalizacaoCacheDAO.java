@@ -47,4 +47,13 @@ public class LocalizacaoCacheDAO {
       return gson.fromJson(json, Localizacao.class);
     }
   }
+
+  public void remover(String veiculoId) {
+    String chave = "cache:veiculo:" + veiculoId;
+
+    try (Jedis jedis = RedisConnection.getConnection()) {
+      jedis.del(chave);
+    }
+  }
+
 }
