@@ -1,25 +1,29 @@
 package com.rastreamento;
 
 import java.time.LocalDateTime;
+
 import com.rastreamento.config.MongoConnection;
+import com.rastreamento.dao.LocalizacaoDAO;
 import com.rastreamento.model.Localizacao;
-import com.rastreamento.repository.LocalizacaoRepository;
 
 public class App {
     public static void main(String[] args) {
+
+        MongoConnection mongo = new MongoConnection();
+
+        LocalizacaoDAO dao = new LocalizacaoDAO(mongo);
+
         Localizacao localizacao = new Localizacao(
-            "VEICULO-001",
-            -32.035,
-            -52.098,
-            LocalDateTime.now()
+                "VEICULO-002",
+                -32.035,
+                -52.098,
+                LocalDateTime.now()
         );
 
-        LocalizacaoRepository repository = new LocalizacaoRepository();
+        dao.inserir(localizacao);
 
-        repository.salvar(localizacao);
+        System.out.println("Localização inserida com sucesso.");
 
-        System.out.println("Localização salva no MongoDB.");
-
-        MongoConnection.close();
+        mongo.close();
     }
 }

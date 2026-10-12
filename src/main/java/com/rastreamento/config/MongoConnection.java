@@ -1,20 +1,52 @@
 package com.rastreamento.config;
 
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 
+import org.bson.codecs.pojo.PojoCodecProvider;
+
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
+
 public class MongoConnection {
-  private static final String URI = "mongodb://localhost:27017";
-  private static final String DATABASE_NAME = "rastreamento";
+  private final MongoClient client;
+  private final MongoDatabase database;
 
-  private static final MongoClient mongoClient = MongoClients.create(URI);
+  public MongoConnection() {
+    var pojoCodecProvider =
+      PojoCodecProvider.builder()
+        .automatic(true)
+        .build();
 
-  public static MongoDatabase getDatabase() {
-    return mongoClient.getDatabase(DATABASE_NAME);
+    var codecRegistry =
+      fromRegistries(
+        MongoClientSettings.getDefaultCodecRegistry(),
+        fromProviders(pojoCodecProvider)
+      );
+
+    var settings =
+      MongoClientSettings.builder()
+        .applyConnectionString(
+          new ConnectionString(
+            "mongodb://localhost:27017"
+          )
+        )
+        .codecRegistry(codecRegistry)
+        .build();
+
+    client = MongoClients.create(settings);
+
+    database = client.getDatabase("rastreamento");
   }
 
-  public static void close() {
-    mongoClient.close();
+  public MongoDatabase getDatabase() {
+    return database;
+  }
+
+  public void close() {
+    client.close();
   }
 }
