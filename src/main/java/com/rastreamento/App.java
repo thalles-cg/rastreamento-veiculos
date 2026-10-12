@@ -1,13 +1,12 @@
 package com.rastreamento;
 
-import java.time.LocalDateTime;
 import java.util.Scanner;
 
 import com.rastreamento.config.MongoConnection;
 import com.rastreamento.dao.LocalizacaoCacheDAO;
 import com.rastreamento.dao.LocalizacaoDAO;
 import com.rastreamento.model.Localizacao;
-import com.rastreamento.service.TelemetriaService;
+import com.rastreamento.service.LocalizacaoService;
 
 public class App {
 
@@ -15,7 +14,8 @@ public class App {
 
         Scanner scanner = new Scanner(System.in);
 
-        MongoConnection mongo = new MongoConnection();
+        MongoConnection mongo =
+                new MongoConnection();
 
         LocalizacaoDAO localizacaoDAO =
                 new LocalizacaoDAO(mongo);
@@ -23,34 +23,40 @@ public class App {
         LocalizacaoCacheDAO cacheDAO =
                 new LocalizacaoCacheDAO();
 
-        TelemetriaService telemetriaService =
-                new TelemetriaService(
+        LocalizacaoService localizacaoService =
+                new LocalizacaoService(
                         localizacaoDAO,
                         cacheDAO
                 );
 
-        System.out.print("Identificador do veículo: ");
-        String veiculoId = scanner.nextLine();
+        System.out.print(
+                "Identificador do veículo: "
+        );
 
-        System.out.print("Latitude: ");
-        double latitude = scanner.nextDouble();
-
-        System.out.print("Longitude: ");
-        double longitude = scanner.nextDouble();
+        String veiculoId =
+                scanner.nextLine();
 
         Localizacao localizacao =
-                new Localizacao(
-                        veiculoId,
-                        latitude,
-                        longitude,
-                        LocalDateTime.now()
-                );
+                localizacaoService
+                        .buscarUltimaLocalizacao(
+                                veiculoId
+                        );
 
-        telemetriaService.registrar(localizacao);
+        if (localizacao == null) {
 
-        System.out.println(
-                "Telemetria registrada com sucesso."
-        );
+            System.out.println(
+                    "Nenhuma localização encontrada para o veículo."
+            );
+
+        } else {
+
+            System.out.println();
+            System.out.println(
+                    "Última localização:"
+            );
+
+            System.out.println(localizacao);
+        }
 
         scanner.close();
         mongo.close();
