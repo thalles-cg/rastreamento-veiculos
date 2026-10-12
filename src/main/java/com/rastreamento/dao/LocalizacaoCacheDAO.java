@@ -25,12 +25,26 @@ public class LocalizacaoCacheDAO {
   }
 
   public void salvar(Localizacao localizacao) {
-      String chave = "cache:veiculo:" + localizacao.getVeiculoId();
+    String chave = "cache:veiculo:" + localizacao.getVeiculoId();
 
-      String json = gson.toJson(localizacao);
+    String json = gson.toJson(localizacao);
 
-      try (Jedis jedis = RedisConnection.getConnection()) {
-        jedis.setex(chave, TTL_SEGUNDOS, json);
+    try (Jedis jedis = RedisConnection.getConnection()) {
+      jedis.setex(chave, TTL_SEGUNDOS, json);
+    }
+  }
+
+  public Localizacao buscar(String veiculoId) {
+    String chave = "cache:veiculo:" + veiculoId;
+
+    try (Jedis jedis = RedisConnection.getConnection()) {
+      String json = jedis.get(chave);
+
+      if (json == null) {
+        return null;
       }
+
+      return gson.fromJson(json, Localizacao.class);
+    }
   }
 }
